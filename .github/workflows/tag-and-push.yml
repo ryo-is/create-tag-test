@@ -1,0 +1,30 @@
+name: Tag and Push
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: "Version bump type: major, minor, or patch"
+        required: true
+        default: "minor"
+
+jobs:
+  create_tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18.18.x"
+          registry-url: https://npm.pkg.github.com/
+      - name: Bump version
+        id: bump_version
+        run: |
+          VERSION_BUMP=${{ github.event.inputs.version_bump }}
+          NEW_VERSION=$(npm version $VERSION_BUMP)
+          echo "::set-output name=NEW_VERSION::$NEW_VERSION"
+      - name: Push Tag
+        run: git push origin --atomic HEAD:${{ github.ref }} ${{ steps.bump_version.outputs.NEW_VERSION }}
