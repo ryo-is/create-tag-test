@@ -3,10 +3,14 @@ name: Tag and Push
 on:
   workflow_dispatch:
     inputs:
-      version_bump:
-        description: "Version bump type: major, minor, or patch"
+      release_version:
+        description: "select release semantic version"
         required: true
-        default: "minor"
+        type: choice
+        options:
+          - "patch"
+          - "minor"
+          - "major"
 
 jobs:
   create_tag:
@@ -19,13 +23,15 @@ jobs:
         with:
           node-version: "18.18.x"
           registry-url: https://npm.pkg.github.com/
+      - name: Git configuration
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-actions@github.com'
       - name: Bump version
         id: bump_version
         run: |
-          VERSION_BUMP=${{ github.event.inputs.version_bump }}
+          VERSION_BUMP=${{ github.event.inputs.release_version }}
           NEW_VERSION=$(npm version $VERSION_BUMP)
-          git config user.name 'github-actions'
-          git config user.email 'github-actions@github.com'
           echo "::set-output name=NEW_VERSION::$NEW_VERSION"
       - name: Push Tag
         run: git push origin --atomic HEAD:${{ github.ref }} ${{ steps.bump_version.outputs.NEW_VERSION }}
