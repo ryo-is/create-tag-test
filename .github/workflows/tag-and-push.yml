@@ -37,6 +37,6 @@ jobs:
       - name: Commit changes
         run: |
           git add package.json
-          git commit -m "chore: Bump version to $NEW_VERSION"
+          git commit -m "chore: Bump version to ${{ steps.bump_version.outputs.NEW_VERSION }}"
       - name: Push Tag
         run: git push origin --atomic HEAD:${{ github.ref }} ${{ steps.bump_version.outputs.NEW_VERSION }}
