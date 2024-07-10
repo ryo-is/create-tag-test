@@ -24,8 +24,8 @@ jobs:
         run: |
           VERSION_BUMP=${{ github.event.inputs.version_bump }}
           NEW_VERSION=$(npm version $VERSION_BUMP)
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
+          git config user.name 'github-actions'
+          git config user.email 'github-actions@github.com'
           echo "::set-output name=NEW_VERSION::$NEW_VERSION"
       - name: Push Tag
         run: git push origin --atomic HEAD:${{ github.ref }} ${{ steps.bump_version.outputs.NEW_VERSION }}
