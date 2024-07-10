@@ -31,7 +31,12 @@ jobs:
         id: bump_version
         run: |
           VERSION_BUMP=${{ github.event.inputs.release_version }}
-          NEW_VERSION=$(npm version $VERSION_BUMP)
+          NEW_VERSION=$(npm version $VERSION_BUMP --no-git-tag-version)
           echo "::set-output name=NEW_VERSION::$NEW_VERSION"
+          git tag $NEW_VERSION
+      - name: Commit changes
+        run: |
+          git add package.json
+          git commit -m "chore: Bump version to $NEW_VERSION"
       - name: Push Tag
         run: git push origin --atomic HEAD:${{ github.ref }} ${{ steps.bump_version.outputs.NEW_VERSION }}
